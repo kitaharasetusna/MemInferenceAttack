@@ -1,13 +1,7 @@
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 from dataLoader import *
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow import keras
-from tensorflow.keras import metrics
-import tensorflow as tf
 from ModelUtil import *
-import configparser
-import sys
 import argparse
 
 parser = argparse.ArgumentParser('Train and save a model (potentially with a defense')
@@ -20,20 +14,25 @@ parser.add_argument('--lr', default=1e-3, type=float, help='learning rate for tr
 parser.add_argument('--shadow', action='store_true', help='Train a shadow model instead of target')
 args = parser.parse_args()
 
-args.shadow=True
+args.shadow = False
 print(args)
 if not args.shadow:
     model_path = f'models/target/{args.dataset}_{args.ndata}_{args.model}.tf'
 else:
     model_path = f'models/shadow/{args.dataset}_{args.ndata}_{args.model}.tf'
 
+print(model_path)
 (x_train, y_train), (x_test, y_test) = load_data(args.dataset, args.shadow, args.ndata)
 
-print(y_train.shape)
+print(x_train.shape[1:])
+# import sys
+# sys.exit()
+print(x_train.shape)
 model = globals()['create_{}_model'.format(args.model)](x_train.shape[1:], y_train.shape[1])
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=args.lr),
                     loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False),
                     metrics=['accuracy'])
+
 model.fit(x_train,
           y_train,
           validation_data=(x_test,y_test),
