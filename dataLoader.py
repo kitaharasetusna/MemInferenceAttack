@@ -58,7 +58,7 @@ def load_cifar10(shadow,ndata):
     y_test = tf.keras.utils.to_categorical(y_test, num_classes=10)
     return (x_train, y_train), (x_test, y_test)
 
-def load_Purchase(shadow,ndata):
+def load_Purchase(shadow, ndata):
     x=[]
     y=[]
     with open('data/purchase', 'r') as infile:
@@ -82,7 +82,7 @@ def load_Purchase(shadow,ndata):
         n_classes = 100
     return (x_train, y_train), (x_test, y_test)
 
-def load_Location(shadow,ndata):
+def load_Location(shadow, ndata):
     x=[]
     y=[]
     with open('data/location', 'r') as infile:

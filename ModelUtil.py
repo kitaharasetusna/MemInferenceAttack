@@ -6,6 +6,7 @@ from tensorflow.keras.applications import ResNet50, ResNet101, VGG16, VGG19, Den
 from tensorflow.keras.layers import *
 
 
+
 def create_nn_model(input_shape, num_classes):
     model = tf.keras.models.Sequential()
     model.add(Dense(128, input_shape=input_shape))
