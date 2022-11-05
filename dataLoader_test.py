@@ -97,8 +97,12 @@ def load_Location(shadow, ndata):
         # p = np.random.permutation(indices)
 
         if shadow == False:
-            x_train, y_train = x[p[:1600]], y[p[:1600]]
-            x_test, y_test = x[p[1600:3200]], y[p[1600:3200]]
+            x_1, y_1 = x[p[:1000]], y[p[:1000]]
+            x_2_m, y_2_m = x[p[3000:3500]], y[p[3000:3500]]
+            x_2_n, y_2_n = x[p[4000:4500]], y[p[4000:4500]]
+            x_3, y_3 = x[p[1000:2000]], y[p[1000:2000]]
+            x_4, y_4 = x[p[2000:3000]], y[p[2000:3000]]
+
         else:
             x_test, y_test = x[p[:1600]], y[p[:1600]]
             x_train, y_train = x[p[1600:3200]], y[p[1600:3200]]
@@ -106,7 +110,7 @@ def load_Location(shadow, ndata):
         input_dim = 446
         n_classes = 30
 
-    return (x_train, y_train), (x_test, y_test)
+    return (x_1, y_1), (x_2_m, y_2_m), (x_2_n, y_2_n), (x_3, y_3), (x_4, y_4)
 
 
 def load_Texas(shadow, ndata):

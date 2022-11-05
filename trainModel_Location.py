@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser('Train and save a model (potentially with a def
 parser.add_argument('--ndata', type=int, default=10000, help='number of data points to use')
 parser.add_argument('--dataset', type=str, default='Location', help='dataset to use')
 parser.add_argument('--model', type=str, default='nn_location', help='model to train as the target')
-parser.add_argument('--epoch', type=int, default='50', help='epoch for training target/shadow models.')
+parser.add_argument('--epoch', type=int, default='60', help='epoch for training target/shadow models.')
 parser.add_argument('--batch_size', default=100, type=int, help='batch size for training target/shadow models.')
 parser.add_argument('--lr', default=1e-3, type=float, help='learning rate for training target/shadow models.')
 parser.add_argument('--shadow', action='store_true', help='Train a shadow model instead of target')
@@ -23,9 +23,13 @@ else:
     model_path = f'models/shadow/{args.dataset}_{args.ndata}_{args.model}.tf'
 
 print(model_path)
-(x_train, y_train), (x_test, y_test) = load_data(args.dataset, args.shadow, args.ndata)
+(x_1, y_1), (x_2_m, y_2_m), (x_2_n, y_2_n), (x_3, y_3), (x_4, y_4)= load_Location(args.shadow, args.ndata)
 '''==================================================='''
 '''This part is used to encode labels from logits'''
+x_train = x_1
+y_train = y_1
+x_test = x_3
+y_test = y_3
 y_train = y_train.astype(int)
 y_test = y_test.astype(int)
 y_train = keras.utils.to_categorical(y_train, num_classes)
