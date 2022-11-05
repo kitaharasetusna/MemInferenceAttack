@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser('Train and save a model (potentially with a def
 parser.add_argument('--ndata', type=int, default=10000, help='number of data points to use')
 parser.add_argument('--dataset', type=str, default='Location', help='dataset to use')
 parser.add_argument('--model', type=str, default='nn_location', help='model to train as the target')
-parser.add_argument('--epoch', type=int, default='50', help='epoch for training target/shadow models.')
+parser.add_argument('--epoch', type=int, default='400', help='epoch for training target/shadow models.')
 parser.add_argument('--batch_size', default=100, type=int, help='batch size for training target/shadow models.')
 parser.add_argument('--lr', default=1e-3, type=float, help='learning rate for training target/shadow models.')
 parser.add_argument('--shadow', action='store_true', help='Train a shadow model instead of target')
