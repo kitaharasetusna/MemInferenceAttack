@@ -267,9 +267,7 @@ np.savez("noise_data_{}.npz".format(args.qt),
          defense_output=result_array,
          defense_output_logits=result_array_logits,
          tc_output=f_evaluate_origin,
-         tc_output_logits=f_evaluate_logits_origin,
-         predict_origin=predict_origin
-         ,predict_modified=predict_modified)
+         tc_output_logits=f_evaluate_logits_origin)
 
 
 
