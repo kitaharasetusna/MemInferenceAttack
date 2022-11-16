@@ -1,4 +1,7 @@
 import os
+
+import numpy as np
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import argparse
 from dataLoader_test import *
@@ -50,22 +53,35 @@ def create_defense_classifier(input_shape, num_classes):
     model.summary()
     return model
 
+
+
+
+
 num_class=len(y_train[0])
 print('-----------------------memGuard------------------------------')
 
-defense_model  = create_defense_classifier(input_shape=num_class, num_classes=num_class)
-defense_model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=args.lr),
-                    loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                    metrics=['accuracy'])
+defense_model  = create_defense_classifier(input_shape=num_class, num_classes=1)
+defense_model.compile(loss=keras.losses.binary_crossentropy,
+                      optimizer=keras.optimizers.SGD(lr=0.001),
+                      metrics=['accuracy'])
 
 '''==================================================='''
 '''train defense classifier'''
+
+
+# x_train = np.sort(x_train, axis=1)
+# x_test = np.sort(x_test, axis=1)
 x_train_attack = np.concatenate([target_model.predict(x_train), target_model.predict(x_test)],
                                  axis=0)
 member_train = np.concatenate([np.ones(len(x_train)), np.zeros(len(x_test))], axis=0)
-
+print(x_train_attack.shape)
+print(member_train.shape)
+print(args.batch_size)
+print(args.epoch)
+# import sys
+# sys.exit()
 defense_model.fit(x_train_attack, member_train,
-                  shuffle=True, batch_size=args.batch_size, epochs=args.epoch, verbose=1)
+                  batch_size=64, epochs=2500, verbose=1)
 '''==================================================='''
 
 '''==================================================='''
@@ -77,6 +93,9 @@ x_evalute_attack = np.concatenate([target_model.predict(x_evalute_mem), target_m
 member_evalute = np.concatenate([np.ones(len(x_evalute_mem)), np.zeros(len(x_evalute_non))], axis=0)
 defense_model.evaluate(x=x_evalute_attack, y=member_evalute)
 '''==================================================='''
+model_path = f'../models/target/{args.dataset}_{args.ndata}_{args.model}_defense.tf'
+defense_model.save(model_path)
+
 
 
 
