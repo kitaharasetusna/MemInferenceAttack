@@ -1,16 +1,21 @@
 from BlindMIUtil import *
+
 from dataLoader import *
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 import sys
+from tqdm import tqdm
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 tf.config.experimental.set_memory_growth(tf.config.experimental.list_physical_devices('GPU')[0], True)
 DATA_NAME = sys.argv[1] if len(sys.argv) > 1 else "CIFAR"
 TARGET_MODEL_GENRE = sys.argv[2] if len(sys.argv) > 2 else "ResNet50"
-TARGET_WEIGHTS_PATH = "weights/Target/{}_{}.hdf5".format(DATA_NAME, TARGET_MODEL_GENRE)
-
-(x_train_tar, y_train_tar), (x_test_tar, y_test_tar), m_true = globals()['load_' + DATA_NAME]('TargetModel')
+TARGET_WEIGHTS_PATH = f'../models/target/{DATA_NAME}_{10000}_{TARGET_MODEL_GENRE}.tf'
+(x_train_tar, y_train_tar), (x_test_tar, y_test_tar) = load_data(DATA_NAME, False, 10000)
+m_train = np.ones(y_train_tar.shape[0])
+m_test = np.zeros(y_test_tar.shape[0])
+member = np.r_[m_train, m_test]
+m_true = member
 # x_train_tar(10,000, 32, 32, 3)
 # y_train_tar(10,000, 100)  like [ [0. 0. 1. ... 0. 0. 0.]...[]]
 # np.r_[x_train_tar, x_test_tar].shape (20000, 32, 32, 3)
