@@ -110,26 +110,42 @@ def diff_Mem_attack(x_, y_true, m_true, target_model, non_Mem_Generator=sobel):
     S_target_prob_k = np.c_[y_pred[y_true.astype(bool)], np.sort(y_pred, axis=1)[:, ::-1][:, :2]]
     nonMem_index = np.random.randint(0, x_.shape[0], size=20)
     '''select 20 random index by nonMem'''
-    nonMem_pred = target_model.predict(non_Mem_Generator(x_[nonMem_index]))
-    nonMem = tf.convert_to_tensor(np.c_[nonMem_pred[y_true[nonMem_index].astype(bool)],
-                                        np.sort(nonMem_pred, axis=1)[:, ::-1][:, :2]])
+    S_nonMem_prob_k = target_model.predict(non_Mem_Generator(x_[nonMem_index]))
 
-    data = tf.data.Dataset.from_tensor_slices((S_target_prob_k, m_true)).shuffle(buffer_size=x_.shape[0]).\
+    '''S_non_prob_k'''
+    '''(1 for good guess)'''
+    '''[1][0.77, 0.19]'''
+    '''[0][0.52, 0.34]'''
+    S_nonMem_prob_k = tf.convert_to_tensor(np.c_[S_nonMem_prob_k[y_true[nonMem_index].astype(bool)],
+                                        np.sort(S_nonMem_prob_k, axis=1)[:, ::-1][:, :2]])
+
+    '''S_target_prob_k'''
+    '''(1 for good guess)'''
+    '''[1][0.77, 0.19]     mem'''
+    '''[0][0.52, 0.34]     non'''
+    S_target_prob_k = tf.data.Dataset.from_tensor_slices((S_target_prob_k, m_true)).shuffle(buffer_size=x_.shape[0]).\
         batch(20).prefetch(tf.data.experimental.AUTOTUNE)
-    print(data)
+
     m_pred, m_true = [], []
     mix_shuffled = []
-    for (mix_batch, m_true_batch) in data:
+    for (mix_batch, m_true_batch) in S_target_prob_k:
         m_pred_batch = np.ones(mix_batch.shape[0])
         m_pred_epoch = np.ones(mix_batch.shape[0])
         nonMemInMix = True
         while nonMemInMix:
+            # print(mix_batch)
+            # print(mix_batch.shape)
+            # print(m_pred_epoch.astype(bool).shape)
+            # print(mix_batch[m_pred_epoch.astype(bool)].shape)
+            # print(mix_batch[m_pred_epoch.astype(bool)][:3])
+            # import sys
+            # sys.exit()
             mix_epoch_new = mix_batch[m_pred_epoch.astype(bool)]
-            dis_ori = mmd_loss(nonMem, mix_epoch_new, weight=1)
+            dis_ori = mmd_loss(S_nonMem_prob_k, mix_epoch_new, weight=1)
             nonMemInMix = False
             for index, item in tqdm(enumerate(mix_batch)):
                 if m_pred_batch[index] == 1:
-                    nonMem_batch_new = tf.concat([nonMem, [mix_batch[index]]], axis=0)
+                    nonMem_batch_new = tf.concat([S_nonMem_prob_k, [mix_batch[index]]], axis=0)
                     mix_batch_new = tf.concat([mix_batch[:index], mix_batch[index+1:]], axis=0)
                     m_pred_without = np.r_[m_pred_batch[:index], m_pred_batch[index+1:]]
                     mix_batch_new = mix_batch_new[m_pred_without.astype(bool, copy=True)]
@@ -143,9 +159,9 @@ def diff_Mem_attack(x_, y_true, m_true, target_model, non_Mem_Generator=sobel):
         m_pred.append(m_pred_batch)
         m_true.append(m_true_batch)
     return np.concatenate(m_true, axis=0), np.concatenate(m_pred, axis=0), \
-           np.concatenate(mix_shuffled, axis=0), nonMem
+           np.concatenate(mix_shuffled, axis=0), S_nonMem_prob_k
 
-m_true, m_pred, mix, nonMem = diff_Mem_attack(np.r_[x_train_tar, x_test_tar],
+m_true, m_pred, mix, S_nonMem_prob_k = diff_Mem_attack(np.r_[x_train_tar, x_test_tar],
                                               np.r_[y_train_tar, y_test_tar],
                                               m_true, Target_Model)
 
