@@ -41,18 +41,24 @@ print('m_true.shape: ', m_true.shape)
 print('diff_Mem_attack(np.r_[x_train_tar, x_test_tar],np.r_[y_train_tar, y_test_tar],m_true, Target_Model)')
 '''----------------------------------------------------------------------------'''
 '''verify the dataset is legal: '''
-def sobel(img_set):
-    ret = np.empty(img_set.shape)
-    for i, img in enumerate(img_set):
+
+'''sobel method to generate artificial image data(only useful for image dataset though'''
+def sobel(img_sample):
+    '''literally it computes the gradients and drawing the contour'''
+    img_generated = np.empty(img_sample.shape)
+    for i, img in enumerate(img_sample):
         grad_x = cv.Sobel(np.float32(img), cv.CV_32F, 1, 0)
         grad_y = cv.Sobel(np.float32(img), cv.CV_32F, 0, 1)
+        '''we have to use the absolute value because negative values have no meanings'''
         gradx = cv.convertScaleAbs(grad_x)
         grady = cv.convertScaleAbs(grad_y)
+        '''then we bing two results together'''
         gradxy = cv.addWeighted(gradx, 0.5, grady, 0.5, 0)
-        ret[i, :] = gradxy
-    return ret
+        img_generated[i, :] = gradxy
+    return img_generated
 
 def compute_pairwise_distances(x, y):
+    '''check the shape is legal'''
     if not len(x.get_shape()) == len(y.get_shape()) == 2:
         raise ValueError('Both inputs should be matrices.')
 
@@ -73,16 +79,13 @@ def gaussian_kernel_matrix(x, y, sigmas):
     return tf.reshape(tf.reduce_sum(tf.exp(-s), 0), tf.shape(dist))
 def maximum_mean_discrepancy(x, y, kernel=gaussian_kernel_matrix):
     with tf.name_scope('MaximumMeanDiscrepancy'):
-        # \E{ K(x, x) } + \E{ K(y, y) } - 2 \E{ K(x, y) }
-        cost = tf.reduce_mean(kernel(x, x))
-        cost += tf.reduce_mean(kernel(y, y))
-        cost -= 2 * tf.reduce_mean(kernel(x, y))
-
-        # We do not allow the loss to become negative.
+        '''E{ K(x, x) } + E{ K(y, y) } - 2 E{ K(x, y) }'''
+        cost = tf.reduce_mean(kernel(x, x))+tf.reduce_mean(kernel(y, y))-2 * tf.reduce_mean(kernel(x, y))
         cost = tf.where(cost > 0, cost, 0, name='value')
     return cost
 
 def mmd_loss(source_samples, target_samples, weight, scope=None):
+    '''sigma to chose'''
     sigmas = [
         1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 5, 10, 15, 20, 25, 30, 35, 100,
         1e3, 1e4, 1e5, 1e6
@@ -97,6 +100,7 @@ def mmd_loss(source_samples, target_samples, weight, scope=None):
     return loss_value
 
 def diff_Mem_attack(x_, y_true, m_true, target_model, non_Mem_Generator=sobel):
+    # x_ (20,000 32 32 3) y_true (20,000 100) m_true(20,000 )
     y_pred = target_model.predict(x_, verbose=0)
     print('y_pred: ', y_pred.shape)
     # y_pred:  (20000, 100)
@@ -108,6 +112,7 @@ def diff_Mem_attack(x_, y_true, m_true, target_model, non_Mem_Generator=sobel):
     '''row2 and row3  biggest 2 scores <-[:, ::-1]reverse the sorted nd-array'''
     '''in this case k=2'''
     S_target_prob_k = np.c_[y_pred[y_true.astype(bool)], np.sort(y_pred, axis=1)[:, ::-1][:, :2]]
+    # print(S_target_prob_k[:5])
     nonMem_index = np.random.randint(0, x_.shape[0], size=20)
     '''select 20 random index by nonMem'''
     S_nonMem_prob_k = target_model.predict(non_Mem_Generator(x_[nonMem_index]))
@@ -121,8 +126,8 @@ def diff_Mem_attack(x_, y_true, m_true, target_model, non_Mem_Generator=sobel):
 
     '''S_target_prob_k'''
     '''(1 for good guess)'''
-    '''[1][0.77, 0.19]     mem'''
-    '''[0][0.52, 0.34]     non'''
+    '''[1][0.77, 0.19]     1（mem）'''
+    '''[0][0.52, 0.34]     0（non）'''
     S_target_prob_k = tf.data.Dataset.from_tensor_slices((S_target_prob_k, m_true)).shuffle(buffer_size=x_.shape[0]).\
         batch(20).prefetch(tf.data.experimental.AUTOTUNE)
 
@@ -133,19 +138,24 @@ def diff_Mem_attack(x_, y_true, m_true, target_model, non_Mem_Generator=sobel):
         m_pred_epoch = np.ones(mix_batch.shape[0])
         nonMemInMix = True
         while nonMemInMix:
+            # print(m_pred_epoch.astype(bool))
             # print(mix_batch)
-            # print(mix_batch.shape)
-            # print(m_pred_epoch.astype(bool).shape)
-            # print(mix_batch[m_pred_epoch.astype(bool)].shape)
-            # print(mix_batch[m_pred_epoch.astype(bool)][:3])
+            # print(mix_batch[m_pred_epoch.astype(bool)])
+            mix_epoch_new = mix_batch[m_pred_epoch.astype(bool)]
+            '''compute original distance'''
+            # print(S_nonMem_prob_k.shape)
+            # print(mix_epoch_new.shape)
+            dis_ori = mmd_loss(S_nonMem_prob_k, mix_epoch_new, weight=1)
+            # print(dis_ori)
             # import sys
             # sys.exit()
-            mix_epoch_new = mix_batch[m_pred_epoch.astype(bool)]
-            dis_ori = mmd_loss(S_nonMem_prob_k, mix_epoch_new, weight=1)
             nonMemInMix = False
             for index, item in tqdm(enumerate(mix_batch)):
+                '''if not in the non mem set'''
                 if m_pred_batch[index] == 1:
+                    '''S_non_mem union this record'''
                     nonMem_batch_new = tf.concat([S_nonMem_prob_k, [mix_batch[index]]], axis=0)
+                    ''' remove unit by indexing tricks'''
                     mix_batch_new = tf.concat([mix_batch[:index], mix_batch[index+1:]], axis=0)
                     m_pred_without = np.r_[m_pred_batch[:index], m_pred_batch[index+1:]]
                     mix_batch_new = mix_batch_new[m_pred_without.astype(bool, copy=True)]
@@ -175,7 +185,7 @@ def evaluate_attack(m_true, m_pred):
     F1_Score = 2 * (precision.result() * recall.result()) / (precision.result() + recall.result())
     print('accuracy:%.4f precision:%.4f recall:%.4f F1_Score:%.4f'
           % (accuracy.result(), precision.result(), recall.result(), F1_Score))
-    
+
 '''TODO: use skrlearn'''
 evaluate_attack(m_true, m_pred)
 
