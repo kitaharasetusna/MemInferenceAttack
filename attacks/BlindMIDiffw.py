@@ -22,15 +22,15 @@ TARGET_WEIGHTS_PATH = f'../models/target/{args.dataset}_{args.ndata}_{args.model
 (x_train_tar, y_train_tar), (x_test_tar, y_test_tar) = load_data(args.dataset, False, 10000)
 
 
-n_values = np.max(y_train_tar) + 1
-y_train_tar= np.eye(n_values)[y_train_tar]
-y_train_tar = y_train_tar.transpose(0, 2, 1)
-y_train_tar = y_train_tar.reshape(-1, y_train_tar.shape[1])
-
-n_test_values = np.max(y_test_tar)+1
-y_test_tar = np.eye(n_test_values)[y_test_tar]
-y_test_tar = y_test_tar.transpose(0, 2, 1)
-y_test_tar = y_test_tar.reshape(-1, y_test_tar.shape[1])
+# n_values = np.max(y_train_tar) + 1
+# y_train_tar= np.eye(n_values)[y_train_tar]
+# y_train_tar = y_train_tar.transpose(0, 2, 1)
+# y_train_tar = y_train_tar.reshape(-1, y_train_tar.shape[1])
+#
+# n_test_values = np.max(y_test_tar)+1
+# y_test_tar = np.eye(n_test_values)[y_test_tar]
+# y_test_tar = y_test_tar.transpose(0, 2, 1)
+# y_test_tar = y_test_tar.reshape(-1, y_test_tar.shape[1])
 
 
 
