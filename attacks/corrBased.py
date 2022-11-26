@@ -48,12 +48,11 @@ target_model = tf.keras.models.load_model(target_model_path)
 shadow_model = tf.keras.models.load_model(shadow_model_path)
 
 
-x_test_attack = np.concatenate([target_model.predict(x_train), target_model.predict(x_shadow)],
-                                 axis=0)
+x_test_attack = np.concatenate([x_train, x_shadow], axis=0)
 y_test_attack = np.concatenate([y_train, y_shadow], axis=0)
 
 member_test = np.concatenate([np.ones(len(x_train)), np.zeros(len(x_shadow))], axis=0)
 predictions = target_model.predict(x_test_attack)
-result = [1 if predictions[i]==y_test_attack[i] else 0 for i in range(len(x_test_attack))]
+result = [1 if np.argmax(predictions[i])==np.argmax(y_test_attack[i]) else 0 for i in range(len(x_test_attack))]
 
 print(classification_report(member_test, result, digits=4))
