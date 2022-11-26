@@ -21,6 +21,7 @@ parser.add_argument('--lr', default=0.001, type=float, help='learning rate for t
 args = parser.parse_args()
 
 print(args)
+
 def create_attack_model(input_shape, num_classes):
     model = tf.keras.Sequential([
         Dense(64, input_shape=input_shape, activation='relu'),
