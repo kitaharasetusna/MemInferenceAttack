@@ -8,9 +8,10 @@ from tensorflow.keras.layers import *
 
 
 def create_nn_model(input_shape, num_classes):
+    k_reg = tf.keras.regularizers.L1L2(l2=reg_constant)
     model = tf.keras.models.Sequential()
-    model.add(Dense(128, input_shape=input_shape))
-    model.add(Dense(num_classes, activation="softmax"))
+    model.add(Dense(128, input_shape=input_shape,kernel_regularizer=k_reg))
+    model.add(Dense(num_classes, activation="softmax",kernel_regularizer=k_reg))
     model.summary()
     return model
 
@@ -24,14 +25,15 @@ def create_cnn_model(input_shape, num_classes):
         )
     )
     model.add(MaxPooling2D(pool_size=(2, 2)))
+    k_reg = tf.keras.regularizers.L1L2(l2=reg_constant)
 
     model.add(Conv2D(32, (5, 5), activation="relu", padding="same"))
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Flatten())
-    model.add(Dense(128, activation="tanh"))
+    model.add(Dense(128, activation="tanh",kernel_regularizer=k_reg))
 
-    model.add(Dense(num_classes, activation="softmax"))
+    model.add(Dense(num_classes, activation="softmax", kernel_regularizer=k_reg))
     model.summary()
     return model
 

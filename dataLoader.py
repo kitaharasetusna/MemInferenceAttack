@@ -80,6 +80,8 @@ def load_Purchase(shadow, ndata):
 
         input_dim = 600
         n_classes = 100
+        y_train = tf.keras.utils.to_categorical(y_train, num_classes=n_classes)
+        y_test = tf.keras.utils.to_categorical(y_test, num_classes=n_classes)
     return (x_train, y_train), (x_test, y_test)
 
 def load_Location(shadow, ndata):
@@ -105,7 +107,8 @@ def load_Location(shadow, ndata):
 
         input_dim = 446
         n_classes = 30
-
+    y_train = tf.keras.utils.to_categorical(y_train, num_classes=n_classes)
+    y_test = tf.keras.utils.to_categorical(y_test, num_classes=n_classes)
     return (x_train, y_train), (x_test, y_test)
 
 
@@ -133,6 +136,8 @@ def load_Texas(shadow, ndata):
             x_train, y_train = x[p[10000:20000]], y[p[10000:20000]]
         input_dim = 6168
         n_classes = 100
+        y_train = tf.keras.utils.to_categorical(y_train, num_classes=n_classes)
+        y_test = tf.keras.utils.to_categorical(y_test, num_classes=n_classes)
     return (x_train, y_train), (x_test, y_test)
 
 
