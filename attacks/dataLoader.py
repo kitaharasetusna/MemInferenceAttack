@@ -61,7 +61,7 @@ def load_cifar10(shadow,ndata):
 def load_Purchase(shadow, ndata):
     x=[]
     y=[]
-    with open('data/purchase', 'r') as infile:
+    with open('../defense/data/purchase/purchase', 'r') as infile:
         reader = csv.reader(infile)
         for line in reader:
             y.append(int(line[0]))

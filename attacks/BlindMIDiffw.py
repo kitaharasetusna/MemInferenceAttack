@@ -7,11 +7,14 @@ from tensorflow.keras.models import load_model
 import sys
 from tqdm import tqdm
 import argparse
+import random
+
 
 parser = argparse.ArgumentParser('Train and save a model (potentially with a defense')
 parser.add_argument('--ndata', type=int, default=10000, help='number of data points to use')
 parser.add_argument('--dataset', type=str, default='cifar100', help='dataset to use')
 parser.add_argument('--model', type=str, default='ResNet50', help='model to train as the target')
+parser.add_argument('--gen', type=str, default='gaussian_noise', help='methods to generate noise')
 args = parser.parse_args()
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
@@ -91,6 +94,22 @@ def gaussian_noise(img_set, mean=0, var=0.001):
         ret[m, :] = out
     return ret
 
+'''adding salt pepper noise'''
+def salt_pepper_noise(img_set, prob=0.001):
+    ret = np.empty(img_set.shape)
+    for m, image in enumerate(img_set):
+        out = np.zeros(image.shape, np.uint8)
+        thres = 1 - prob
+        for i in range(image.shape[0]):
+                rdn = random.random()
+                if rdn < prob:
+                    out[i] = 0
+                elif rdn > thres:
+                    out[i] = 255
+                else:
+                    out[i] = image[i]
+        ret[m,:] = out
+    return ret
 
 def compute_pairwise_distances(x, y):
     '''check the shape is legal'''
@@ -134,7 +153,16 @@ def mmd_loss(source_samples, target_samples, weight, scope=None):
 
     return loss_value
 
-def diff_Mem_attack(x_, y_true, m_true, target_model, non_Mem_Generator=gaussian_noise):
+gen = None
+print(args.gen)
+if args.gen=="sobel":
+    gen = sobel
+if args.gen=="salt_pepper_noise":
+    gen = salt_pepper_noise
+if args.gen=="gaussian_noise":
+    gen = gaussian_noise
+
+def diff_Mem_attack(x_, y_true, m_true, target_model, non_Mem_Generator=gen):
     # x_ (20,000 32 32 3) y_true (20,000 100) m_true(20,000 )
     y_pred = target_model.predict(x_, verbose=0)
     print('y_pred: ', y_pred.shape)
