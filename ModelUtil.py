@@ -7,7 +7,7 @@ from tensorflow.keras.layers import *
 
 
 
-def create_nn_model(input_shape, num_classes):
+def create_nn_model(input_shape, num_classes,reg_constant=1e-7):
     k_reg = tf.keras.regularizers.L1L2(l2=reg_constant)
     model = tf.keras.models.Sequential()
     model.add(Dense(128, input_shape=input_shape,kernel_regularizer=k_reg))
@@ -15,7 +15,7 @@ def create_nn_model(input_shape, num_classes):
     model.summary()
     return model
 
-def create_cnn_model(input_shape, num_classes):
+def create_cnn_model(input_shape, num_classes, reg_constant=1e-7):
     model = tf.keras.models.Sequential()
     model.add(
         Conv2D(32, (5, 5),
