@@ -15,12 +15,16 @@ parser.add_argument('--ndata', type=int, default=10000, help='number of data poi
 parser.add_argument('--dataset', type=str, default='cifar10', help='dataset to use')
 parser.add_argument('--model', type=str, default='cnn', help='model to train as the target')
 parser.add_argument('--epoch', type=int, default='50', help='epoch for training target/shadow models.')
-parser.add_argument('--batch_size', default=100, type=int, help='batch size for training target/shadow models.')
-parser.add_argument('--lr', default=0.01, type=float, help='learning rate for training target/shadow models.')
+parser.add_argument('--batch_size', default=128, type=int, help='batch size for training target/shadow models.')
+parser.add_argument('--lr', default=0.001, type=float, help='learning rate for training target/shadow models.')
 # parser.add_argument('--shadow', action='store_true', help='Train a shadow model instead of target')
 args = parser.parse_args()
 
 print(args)
+if args.dataset=='cifar10':
+    num_classes = 10
+else:
+    num_classes = 100
 def create_attack_model(input_shape, num_classes):
     model = tf.keras.Sequential([
         Dense(64, input_shape=input_shape, activation='relu'),
@@ -36,7 +40,7 @@ def clipDataTopX(dataToClip, top=3):
 
 # load data
 (x_train, y_train), (x_shadow, y_shadow) = load_data(args.dataset, False, args.ndata)
-
+num_class=len(y_train[0])
 print('-----------------------mlleaks------------------------------')
 attack_model= create_attack_model(input_shape=(3,),num_classes=2)
 attack_model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=args.lr),

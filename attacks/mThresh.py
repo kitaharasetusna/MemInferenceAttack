@@ -20,8 +20,12 @@ parser.add_argument('--lr', default=0.01, type=float, help='learning rate for tr
 # parser.add_argument('--shadow', action='store_true', help='Train a shadow model instead of target')
 args = parser.parse_args()
 
-num_classes=10
+
 print(args)
+if args.dataset=='cifar10':
+    num_classes = 10
+else:
+    num_classes = 100
 def create_attack_model(input_shape, num_classes):
     model = tf.keras.Sequential([
         Dense(128, input_shape=input_shape, activation='relu'),
@@ -57,7 +61,7 @@ def best_threshold(loss_attack, member_roc, member):
 
 # load data
 (x_train, y_train), (x_shadow, y_shadow) = load_data(args.dataset, False, args.ndata)
-
+num_class=len(y_train[0])
 y_train, y_shadow = tf.argmax(y_train, axis=1), tf.argmax(y_shadow, axis=1)
 
 print('-----------------------loss based------------------------------')
