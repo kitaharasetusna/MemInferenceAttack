@@ -20,6 +20,20 @@ tf.config.experimental.set_memory_growth(tf.config.experimental.list_physical_de
 # TARGET_MODEL_GENRE = sys.argv[2] if len(sys.argv) > 2 else "ResNet50"
 TARGET_WEIGHTS_PATH = f'../models/target/{args.dataset}_{args.ndata}_{args.model}.tf'
 (x_train_tar, y_train_tar), (x_test_tar, y_test_tar) = load_data(args.dataset, False, 10000)
+
+
+n_values = np.max(y_train_tar) + 1
+y_train_tar= np.eye(n_values)[y_train_tar]
+y_train_tar = y_train_tar.transpose(0, 2, 1)
+y_train_tar = y_train_tar.reshape(-1, y_train_tar.shape[1])
+
+n_test_values = np.max(y_test_tar)+1
+y_test_tar = np.eye(n_test_values)[y_test_tar]
+y_test_tar = y_test_tar.transpose(0, 2, 1)
+y_test_tar = y_test_tar.reshape(-1, y_test_tar.shape[1])
+
+
+
 m_train = np.ones(y_train_tar.shape[0])
 m_test = np.zeros(y_test_tar.shape[0])
 member = np.r_[m_train, m_test]
@@ -29,6 +43,10 @@ m_true = member
 # np.r_[x_train_tar, x_test_tar].shape (20000, 32, 32, 3)
 # np.r_[y_train_tar, y_test_tar]:  (20000, 100)
 # m_true.shape:  (20000,)
+
+
+
+
 '''verify the dataset is legal: '''
 '''----------------------------------------------------------------------------'''
 Target_Model = load_model(TARGET_WEIGHTS_PATH)
@@ -56,6 +74,23 @@ def sobel(img_sample):
         gradxy = cv.addWeighted(gradx, 0.5, grady, 0.5, 0)
         img_generated[i, :] = gradxy
     return img_generated
+
+'''adding noise to the data'''
+def gaussian_noise(img_set, mean=0, var=0.001):
+    ret = np.empty(img_set.shape)
+    for m, image in enumerate(img_set):
+        image = np.array(image/255, dtype=float)
+        noise = np.random.normal(mean, var ** 0.5, image.shape)
+        out = image + noise
+        if out.min() < 0:
+            low_clip = -1.
+        else:
+            low_clip = 0.
+        out = np.clip(out, low_clip, 1.0)
+        out = np.uint8(out*255)
+        ret[m, :] = out
+    return ret
+
 
 def compute_pairwise_distances(x, y):
     '''check the shape is legal'''
@@ -99,7 +134,7 @@ def mmd_loss(source_samples, target_samples, weight, scope=None):
 
     return loss_value
 
-def diff_Mem_attack(x_, y_true, m_true, target_model, non_Mem_Generator=sobel):
+def diff_Mem_attack(x_, y_true, m_true, target_model, non_Mem_Generator=gaussian_noise):
     # x_ (20,000 32 32 3) y_true (20,000 100) m_true(20,000 )
     y_pred = target_model.predict(x_, verbose=0)
     print('y_pred: ', y_pred.shape)

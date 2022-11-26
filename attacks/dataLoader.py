@@ -85,7 +85,7 @@ def load_Purchase(shadow, ndata):
 def load_Location(shadow, ndata):
     x=[]
     y=[]
-    with open('defense/data/location/location', 'r') as infile:
+    with open('../defense/data/location/location', 'r') as infile:
         reader = csv.reader(infile)
         for line in reader:
             y.append(int(line[0]))
