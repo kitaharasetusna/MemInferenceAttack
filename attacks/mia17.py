@@ -24,7 +24,7 @@ print(args)
 
 def create_attack_model(input_shape, num_classes):
     model = tf.keras.Sequential([
-        Dense(64, input_shape=input_shape, activation='relu'),
+        Dense(128, input_shape=input_shape, activation='relu'),
         Dense(num_classes),
         Activation('softmax')
     ])
