@@ -16,7 +16,7 @@ parser.add_argument('--dataset', type=str, default='cifar10', help='dataset to u
 parser.add_argument('--model', type=str, default='cnn', help='model to train as the target')
 parser.add_argument('--epoch', type=int, default='50', help='epoch for training target/shadow models.')
 parser.add_argument('--batch_size', default=100, type=int, help='batch size for training target/shadow models.')
-parser.add_argument('--lr', default=0.01, type=float, help='learning rate for training target/shadow models.')
+parser.add_argument('--lr', default=0.001, type=float, help='learning rate for training target/shadow models.')
 # parser.add_argument('--shadow', action='store_true', help='Train a shadow model instead of target')
 args = parser.parse_args()
 
