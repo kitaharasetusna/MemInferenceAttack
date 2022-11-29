@@ -128,3 +128,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 defense/data/purchase/purchase
+models/shadow/Purchase_5000_nn.tf/keras_metadata.pb
+models/shadow/Purchase_5000_nn.tf/saved_model.pb
+models/shadow/Purchase_5000_nn.tf/variables/variables.data-00000-of-00001
+models/shadow/Purchase_5000_nn.tf/variables/variables.index
+attacks/ModelUtil.py
+attacks/ModelUtil.py
+*.py
+*.py

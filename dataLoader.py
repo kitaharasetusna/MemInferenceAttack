@@ -115,12 +115,12 @@ def load_Location(shadow, ndata):
 def load_Texas(shadow, ndata):
     x = []
     y = []
-    with open('data/texas/100/feats', 'r') as infile:
+    with open('defense/data/texas/feats', 'r') as infile:
         reader = csv.reader(infile)
         for line in reader:
             x.append([int(x) for x in line[1:]])
-            x = np.array(x)
-    with open('data/texas/100/labels', 'r') as infile:
+        x = np.array(x)
+    with open('defense/data/texas/labels', 'r') as infile:
         reader = csv.reader(infile)
         for line in reader:
             y.append(int(line[0]))

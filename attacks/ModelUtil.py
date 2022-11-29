@@ -7,7 +7,7 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.layers import *
 from tensorflow.keras import backend as K
-# from keras_applications.imagenet_utils import _obtain_input_shape
+from keras_applications.imagenet_utils import _obtain_input_shape
 
 def create_nn_model(input_shape, num_classes,reg_constant=1e-7):
     k_reg = tf.keras.regularizers.L1L2(l2=reg_constant)

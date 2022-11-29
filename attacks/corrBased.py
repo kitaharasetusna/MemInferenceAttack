@@ -42,10 +42,10 @@ attack_model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=args.lr),
                     metrics=['accuracy'])
 
 # load target and shadow model
-target_model_path = f'models/target/{args.dataset}_{args.ndata}_{args.model}.tf'
-shadow_model_path = f'models/shadow/{args.dataset}_{args.ndata}_{args.model}.tf'
+target_model_path = f'../models/target/{args.dataset}_{args.ndata}_{args.model}.tf'
+shadow_model_path = f'../models/shadow/{args.dataset}_{args.ndata}_{args.model}.tf'
 target_model = tf.keras.models.load_model(target_model_path)
-shadow_model = tf.keras.models.load_model(shadow_model_path)
+#shadow_model = tf.keras.models.load_model(shadow_model_path)
 
 
 x_test_attack = np.concatenate([x_train, x_shadow], axis=0)
