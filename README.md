@@ -12,4 +12,8 @@ Defenses:](https://arxiv.org/abs/2101.01341) (Hui et al., 2021 NDSS)<br>
 •	[MemGuard: Defending against Black-Box Membership Inference Attacks via Adversarial Examples](https://arxiv.org/abs/1909.10594) (Jia et al., 2019 CCS)
 
 
-All the attacks are written in /attacks folder, we tried to wirte [defense](https://arxiv.org/abs/1909.10594) but failed to test on all dataset except on MNIST. Thus in /denfese folder, are codes we will work on but failed for now.
+All the attacks are written in /attacks folder, we tried to wirte [defense](https://arxiv.org/abs/1909.10594) but failed to test on all dataset except on location dataset. Thus in /denfese folder, are codes we will work on but failed for now.
+
+
+Our test dataset can be found in Tensorflow Datasets（torchvision）<br>
+Non image dataset can be found in https://github.com/privacytrustlab/datasets.
