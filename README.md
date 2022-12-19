@@ -21,8 +21,14 @@ Non image dataset can be found in https://github.com/privacytrustlab/datasets.
 
 
 ## How to use the repository
-One should train first, using trainModel.py
+One should train first, using trainModel.py (Following dataset can be viewed as an exmaple on cifar10 dataset)
 
 ```python
 python ./trainModel.py --ndata 10000 --dataset cifar10 --model cnn --epoch 50 --batch_size 128 --lr 1e-3 
+```
+Then the trained model will be stored in ../models/target/{args.dataset}_{args.ndata}_{args.model}.tf<br>
+one can use python files in /attacks to do the attack. 
+```python
+cd ./attacks
+BlindMidiffw.py --ndata 10000 --dataset cifar10 --model ResNet50 --gen 50 --test False
 ```
