@@ -19,7 +19,7 @@ parser.add_argument('--gen', type=str, default='gaussian_noise', help='methods t
 parser.add_argument('--test', type=bool, default='False', help='choose test or not')
 args = parser.parse_args()
 
-test_or_not = False
+test_or_not = True
 
 print(test_or_not)
 def evaluate_attack(m_true, m_pred):
@@ -41,7 +41,7 @@ if test_or_not==False:
     # DATA_NAME = sys.argv[1] if len(sys.argv) > 1 else "CIFAR"
     # TARGET_MODEL_GENRE = sys.argv[2] if len(sys.argv) > 2 else "ResNet50"
     TARGET_WEIGHTS_PATH = f'../models/target/{args.dataset}_{args.ndata}_{args.model}.tf'
-    (x_train_tar, y_train_tar), (x_test_tar, y_test_tar) = load_data(args.dataset, False, 10000)
+    (x_train_tar, y_train_tar), (x_test_tar, y_test_tar) = load_data(args.dataset, False, args.ndata)
 
 
     # n_values = np.max(y_train_tar) + 1
@@ -245,7 +245,7 @@ if test_or_not==False:
                         m_pred_without = np.r_[m_pred_batch[:index], m_pred_batch[index+1:]]
                         mix_batch_new = mix_batch_new[m_pred_without.astype(bool, copy=True)]
                         dis_new = mmd_loss(nonMem_batch_new, mix_batch_new, weight=1)
-                        m_pred_dis_epoch[index] = dis_new
+                        m_pred_dis_epoch[index] = dis_new-dis_ori
                         if dis_new > dis_ori:
                             nonMemInMix = True
                             m_pred_epoch[index] = 0
@@ -288,16 +288,19 @@ if test_or_not==True:
     m_pred_dis = normalization(m_pred_dis)
     print(m_pred_dis)
     fpr, tpr, thresholds = roc_curve(m_true, m_pred_dis, pos_label=1)
-    auc = auc(fpr, tpr)
-    plt.figure(figsize=(5,5), dpi=100)
-    plt.plot(fpr, tpr, label='BlindMi (auc=%0.3f)'%auc)
-    plt.xlabel('false positive rate')
-    plt.ylabel('true positive rate')
-    plt.legend()
-    plt.show()
+    roc = np.array([fpr, tpr])
+    os.makedirs(f'models/{args.dataset}_{args.ndata}_{args.model}', exist_ok=True)
+    np.savetxt(f'models/{args.dataset}_{args.ndata}_{args.model}/BlinMi.out', roc, delimiter=',')
+    # auc = auc(fpr, tpr)
+    # plt.figure(figsize=(5,5), dpi=100)
+    # plt.plot(fpr, tpr, label='BlindMi (auc=%0.3f)'%auc)
+    # plt.xlabel('false positive rate')
+    # plt.ylabel('true positive rate')
+    # plt.legend()
+    # plt.show()
     # auc_val=roc_auc_score(y_true=m_true, y_score=m_pred, multi_class='ovo')
     # print(auc_val)
-    evaluate_attack(m_true, m_pred)
+    # evaluate_attack(m_true, m_pred)
 
 
 
