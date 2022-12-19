@@ -23,6 +23,6 @@ Non image dataset can be found in https://github.com/privacytrustlab/datasets.
 ## How to use the repository
 One should train first, using trainModel.py
 
----python
+```python
 python ./trainModel.py --ndata [10000] --dataset [cifar10] --model [cnn] --epoch [50] --batch_size [128] --lr [1e-3] --[shadow] 
----
+```
