@@ -1,7 +1,7 @@
 # MemInferenceAttack
 
 This repository is built to reproduce some MIA（membership inference attack）<br>
-And it's written in pytorch
+And it's written in pytorch<br>
 All the papers we referred to are shown as below：<br>
 
 Attacks: <br>
