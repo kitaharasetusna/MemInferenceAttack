@@ -10,3 +10,6 @@ Attacks: <br>
 Defenses:](https://arxiv.org/abs/2101.01341) (Hui et al., 2021 NDSS)<br> 
 •	[Machine Learning with Membership Privacy using Adversarial Regularization ](https://dl.acm.org/doi/pdf/10.1145/3243734.3243855)  (Nasr et al. 2019 CCS)<br>
 •	[MemGuard: Defending against Black-Box Membership Inference Attacks via Adversarial Examples](https://arxiv.org/abs/1909.10594) (Jia et al., 2019 CCS)
+
+
+All the attacks are written in /attacks folder, we tried to wirte [defense](https://arxiv.org/abs/1909.10594) but failed to test on all dataset except on MNIST. Thus in /denfese folder, are codes we will work on but failed for now.
