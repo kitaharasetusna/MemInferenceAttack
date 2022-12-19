@@ -30,5 +30,5 @@ Then the trained model will be stored in ../models/target/{args.dataset}_{args.n
 one can use python files in /attacks to do the attack. 
 ```python
 cd ./attacks
-BlindMidiffw.py --ndata 10000 --dataset cifar10 --model ResNet50 --gen 50 --test False
+python BlindMidiffw.py --ndata 10000 --dataset cifar10 --model ResNet50 --gen 50 --test False
 ```
