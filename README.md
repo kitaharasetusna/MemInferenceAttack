@@ -1,8 +1,7 @@
 # MemInferenceAttack
 
-This repository is built to reproduce some MIAs（membership inference attack）<br>
-it's written in Tensorflow 2.2.0<br>
-All the papers we referred to are shown as below：<br>
+This repository is built to reproduce some membership inference attacks (MIAs)<br>
+It's written in Tensorflow 2.2.0<br>
 
 ## Dataset
 Image dataset can be found in Tensorflow Datasets<br>
